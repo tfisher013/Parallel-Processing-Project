@@ -11,6 +11,8 @@ DOUBLE_SIZE = 8
 # set this depending on whether the matrix is holding integers, floats, etc.
 MATRIX_ELEMENT_SIZE = DOUBLE_SIZE
 
+val_type = "integer" if MATRIX_ELEMENT_SIZE == INTEGER_SIZE else "double"
+
 dims = [1000, 10000, 100000]
 densities = [0.05, 0.25, 0.5, 0.75, 1.0]
 
@@ -40,5 +42,6 @@ for dim in dims:
     plt.plot(densities, csr_vals, label='CSR Format')
     plt.plot(densities, dense_vals, label='Dense Format')
     plt.legend()
-    plt.annotate('Matrix contains values of type double', xy = (0.1, 0.1))
+    plt.subplots_adjust(bottom=0.15)
+    plt.figtext(0.25, 0.01, 'Matrix contains values of type '+val_type, ha="center", fontsize=10)
 plt.show()
