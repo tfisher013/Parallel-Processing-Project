@@ -8,13 +8,18 @@
  * ASSUMPTIONS:
  *  1. matrix is stored in matrix market format (.mtx)
  *  2. matrix is square
+ *
+ * Arguments:
+ *  char *filename
+ *
+ * Return Type:
+ *  int
  */
-int getStandardMatrixDimension(char *fileName)
+int getStandardMatrixDimension(char *filename)
 {
-    FILE *fptr;
-
     // Open a file in read mode
-    fptr = fopen(fileName, "r");
+    FILE *fptr;
+    fptr = fopen(filename, "r");
 
     // Create array to hold each line
     char fileLine[100];
@@ -27,7 +32,6 @@ int getStandardMatrixDimension(char *fileName)
         // research/sparse/matrices/list_by_id.html)
         if (fileLine[0] == '%')
         {
-            printf("Ignoring line\n");
         }
         // extract row (assumed to equal col) from first line
         else
@@ -36,12 +40,14 @@ int getStandardMatrixDimension(char *fileName)
             char *rest = fileLine;
             char *p[1];
 
+            // split line with delimiter = " "
             while ((token = strtok_r(rest, " ", &rest)))
             {
                 p[0] = token;
                 break;
             }
 
+            // store first integer (# rows) on this line
             dim = atoi(p[0]);
             break;
         }
@@ -55,21 +61,25 @@ int getStandardMatrixDimension(char *fileName)
  * ASSUMPTIONS:
  *  1. matrix is stored in matrix market format (.mtx)
  *  2. matrix is of type double
+ *
+ * Arguments:
+ *  char *filename
+ *  int dim
+ *  double **matrix
+ *
+ * Return Type:
+ *  void
  */
-double **getStandardMatrix(char *fileName, double **matrix)
+void getStandardMatrix(char *fileName, int dim, double matrix[][dim])
 {
-
-    FILE *fptr;
-
     // Open a file in read mode
+    FILE *fptr;
     fptr = fopen(fileName, "r");
 
     // Create array to hold each line
     char fileLine[100];
 
-    int nrows = 0;
-    int ncols = 0;
-    int nonZeros = 0;
+    int firstLine = 0;
     while (fgets(fileLine, 100, fptr))
     {
         // Skip commented lines at the top of the file (this seems to
@@ -77,14 +87,19 @@ double **getStandardMatrix(char *fileName, double **matrix)
         // research/sparse/matrices/list_by_id.html)
         if (fileLine[0] == '%')
         {
-            printf("Ignoring line\n");
         }
-        // extract row, col, and # nonzeros from first line
+        else if (firstLine == 0)
+        {
+            // register when we pass the dimension line (data in that
+            // line not needed for this method though)
+            firstLine = 1;
+        }
         else
         {
             char *token;
             char *rest = fileLine;
-            char *p[3];
+            const char *p[3];
+            char *q;
 
             int counter = 0;
             while ((token = strtok_r(rest, " ", &rest)))
@@ -92,50 +107,14 @@ double **getStandardMatrix(char *fileName, double **matrix)
                 p[counter++] = token;
             }
 
-            nrows = atoi(p[0]);
-            ncols = atoi(p[1]);
-            nonZeros = atoi(p[2]);
+            int row = atoi(p[0]);
+            int col = atoi(p[1]);
+            double val = strtod(p[2], NULL);
 
-            break;
+            matrix[row - 1][col - 1] = val;
         }
-    }
-
-    // intialize a matrix of zeros of correct dimension
-    double funcMatrix[nrows][ncols];
-
-    // place nonzeros into correct positions in matrix
-    while (fgets(fileLine, 100, fptr))
-    {
-        char *token;
-        char *rest = fileLine;
-        char *p[3];
-        char *q;
-
-        int counter = 0;
-        while ((token = strtok_r(rest, " ", &rest)))
-        {
-            p[counter++] = token;
-        }
-
-        int row = atoi(p[0]);
-        int col = atoi(p[1]);
-        double val = strtod(p[2], NULL);
-
-        matrix[row][col] = val;
     }
 
     // Close the file
     fclose(fptr);
-
-    // for (int i = 0; i < nrows; i++)
-    // {
-    //     double *row[ncols];
-    //     for (int j = 0; j < ncols; j++)
-    //     {
-    //         *(row[j]) = funcMatrix[i][j];
-    //     }
-    //     *(matrix[i]) = row;
-    // }
-
-    return matrix;
 }
