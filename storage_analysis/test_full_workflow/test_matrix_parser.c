@@ -61,18 +61,21 @@ int main(int argc, char *argv[])
     convertToCOO(&coo, dim, dim, matrix);
     printf("Printing matrix in COO format:\n");
     printCOO(&coo);
+    freeCOO(&coo);
 
     // convert 2D matrix to CSR format and print
     CSR csr;
     convertToCSR(&csr, dim, dim, matrix);
     printf("Printing matrix in CSR format:\n");
     printCSR(&csr);
+    freeCSR(&csr);
 
     // convert 2D matrix to CSC format and print
     CSC csc;
     convertToCSC(&csc, dim, dim, matrix);
     printf("Printing matrix in CSC format:\n");
     printCSC(&csc);
+    freeCSC(&csc);
 
     // do whatever you want...
 
