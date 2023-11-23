@@ -4,25 +4,10 @@
 #include <time.h>
 #include "uniform_random_matrix_generator.h"
 
-// main function for testing matrix generator
-int main(int argc, char *argv[])
-{
-
-    // set these variables to specify matrix options
-    int DIMENSION = 1000;
-    double DENSITY = 0.5;
-
-    // instatiate DIMENSION x DIMENSION array to pass to matrix generator
-    double generated_matrix[DIMENSION][DIMENSION];
-
-    uniformRandomMatrix(DIMENSION, DENSITY, generated_matrix);
-
-    return 0;
-}
-
 /**
- * Returns a square 2D array of double with the specified dimension and density. The nonzero
- * elements of the matrix are distributed uniformly throughout the matrix.
+ * Populates a square 2D array of type double with values according to the
+ * supplied matrix dimension and density. The nonzero elements of the matrix
+ * are distributed uniformly throughout the matrix.
  *
  * Arguments:
  *  int dim
