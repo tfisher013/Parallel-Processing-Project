@@ -9,4 +9,5 @@
  * Return type
  *  double**
  */
-void uniformRandomMatrix(const int dim, const double density, double matrix[][dim]);
+// void uniformRandomMatrix(const int dim, const double density, double matrix[][dim]);
+void uniformRandomMatrix(const int dim, const double density, double *matrix);

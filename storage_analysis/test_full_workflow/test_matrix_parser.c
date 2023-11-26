@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "../../util/parse_matrix_file/read_matrix_file.h"
 #include "../../util/format_datatypes/COO.h"
 #include "../../util/format_datatypes/CSR.h"
@@ -19,7 +20,7 @@
  *  gcc -o executable_name COO.o CSR.o CSC.o read_matrix_file.o test_matrix_parser.o
  * 3. Run executable (don't forget to provide filename arg)
  *  ./executable_name ../../matrices/matrix_file_name
- * 
+ *
  */
 int main(int argc, char *argv[])
 {
@@ -37,7 +38,7 @@ int main(int argc, char *argv[])
 
     // 2. intialize a 2D array of correct dimension to hold
     // data
-    double matrix[dim][dim];
+    double *matrix = malloc(dim * dim * sizeof(double));
 
     // 3. pass matrix to this method where it will be populated
     // with matrix data
@@ -50,7 +51,7 @@ int main(int argc, char *argv[])
     {
         for (int j = 0; j < dim; j++)
         {
-            printf("%f ", matrix[i][j]);
+            printf("%f ", matrix[i * dim + j]);
         }
         printf("\n");
     }
@@ -77,6 +78,5 @@ int main(int argc, char *argv[])
     printCSC(&csc);
     freeCSC(&csc);
 
-    // do whatever you want...
-
+    free(matrix);
 }

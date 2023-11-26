@@ -60,17 +60,17 @@ int getStandardMatrixDimension(char *filename)
  * Returns the matrix stored in the provided file as a 2D matrix.
  * ASSUMPTIONS:
  *  1. matrix is stored in matrix market format (.mtx)
- *  2. matrix is of type double
+ *  2. matrix values are of type double
  *
  * Arguments:
  *  char *filename
  *  int dim
- *  double **matrix
+ *  double *matrix
  *
  * Return Type:
  *  void
  */
-void getStandardMatrix(char *fileName, int dim, double matrix[][dim])
+void getStandardMatrix(char *fileName, int dim, double *matrix)
 {
     // Open a file in read mode
     FILE *fptr;
@@ -111,7 +111,7 @@ void getStandardMatrix(char *fileName, int dim, double matrix[][dim])
             int col = atoi(p[1]);
             double val = strtod(p[2], NULL);
 
-            matrix[row - 1][col - 1] = val;
+            matrix[(row - 1) * dim + col - 1] = val;
         }
     }
 
