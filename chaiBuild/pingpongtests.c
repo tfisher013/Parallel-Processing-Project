@@ -131,10 +131,10 @@ int main(int argc, char *argv[])
 
   int numpong = 5000;
 
-  char* matrix_file_path = "../matrices/dimension_5_nonzeros_19.mtx";
+  char *matrix_file_path = "../matrices/dimension_5_nonzeros_19.mtx";
 
   int dim = getStandardMatrixDimension(matrix_file_path);
-  double matrix[dim][dim];
+  double *matrix = malloc(dim * dim * sizeof(double));
   getStandardMatrix(matrix_file_path, dim, matrix);
 
   // perform CSC pingpong timing
@@ -154,6 +154,8 @@ int main(int argc, char *argv[])
   convertToCSR(&csr, dim, dim, matrix);
   pingpongCSR(csr.values, csr.cols, csr.rowPtrs, csr.nnz, numpong, rank, dim);
   freeCSR(&csr);
+
+  free(matrix);
 
   MPI_Finalize();
 }
