@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 
     // SET THIS VARIABLE FOR THE NUMBER OF DENSITY INTERVALS
     // BETWEEN 1/n AND 1
-    int NUM_INTERVALS = 5;
+    int NUM_INTERVALS = 10;
 
     if (argc != 2)
     {
