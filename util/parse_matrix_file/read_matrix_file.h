@@ -13,4 +13,4 @@ int getStandardMatrixDimension(char *fileName);
  *  1. matrix is stored in matrix market format (.mtx)
  *  2. matrix is of type double
  */
-void getStandardMatrix(char *fileName, int dim, double matrix[][dim]);
+void getStandardMatrix(char *fileName, int dim, double *matrix);

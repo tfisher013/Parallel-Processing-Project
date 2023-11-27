@@ -6,6 +6,6 @@ typedef struct {
     int numRowPtrs;
 } CSR;
 
-void convertToCSR(CSR *csr, int n, int m, double mat[n][m]);
+void convertToCSR(CSR *csr, int n, int m, double *mat);
 void printCSR(CSR *csr);
 void freeCSR(CSR *csr);

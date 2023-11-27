@@ -16,7 +16,8 @@
  * Return type
  *  double**
  */
-void uniformRandomMatrix(const int dim, const double density, double matrix[][dim])
+// void uniformRandomMatrix(const int dim, const double density, double matrix[][dim])
+void uniformRandomMatrix(const int dim, const double density, double *matrix)
 {
     // set up random number generator
     // thanks to https://stackoverflow.com/questions/33058848/generate-a-random-double-between-1-and-1
@@ -40,7 +41,7 @@ void uniformRandomMatrix(const int dim, const double density, double matrix[][di
 
             if (rand_num <= density)
             {
-                matrix[i][j] = rand_num;
+                matrix[i * dim + j] = rand_num;
                 num_non_zeros++;
             }
         }

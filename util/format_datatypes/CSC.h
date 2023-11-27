@@ -6,6 +6,6 @@ typedef struct {
   int numColPtrs;
 } CSC;
 
-void convertToCSC(CSC *csc, int n, int m, double mat[n][m]);
+void convertToCSC(CSC *csc, int n, int m, double *mat);
 void printCSC(CSC *csc);
 void freeCSC(CSC *csc);
