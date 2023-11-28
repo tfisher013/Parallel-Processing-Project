@@ -15,8 +15,8 @@ void convertToCSR(CSR *csr, int n, int m, double *mat)
     }
 
     csr->values = malloc(nnz * sizeof(double));
-    csr->cols = malloc(nnz * sizeof(double));
-    csr->rowPtrs = malloc((m + 1) * sizeof(double));
+    csr->cols = malloc(nnz * sizeof(int));
+    csr->rowPtrs = malloc((m + 1) * sizeof(int));
     csr->nnz = nnz;
     csr->numRowPtrs = 0;
 
