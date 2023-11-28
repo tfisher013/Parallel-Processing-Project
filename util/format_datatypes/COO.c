@@ -15,8 +15,8 @@ void convertToCOO(COO *coo, int n, int m, double *mat)
     }
 
     coo->values = malloc(nnz * sizeof(double));
-    coo->cols = malloc(nnz * sizeof(double));
-    coo->rows = malloc(nnz * sizeof(double));
+    coo->cols = malloc(nnz * sizeof(int));
+    coo->rows = malloc(nnz * sizeof(int));
     coo->nnz = nnz;
 
     int k = 0;
