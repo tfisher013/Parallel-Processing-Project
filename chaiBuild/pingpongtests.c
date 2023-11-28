@@ -129,13 +129,17 @@ int main(int argc, char *argv[])
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &procs);
 
+  if(argc < 1) {
+    printf("Please provide matrix file name as command line argument. Exiting.\n");
+    MPI_Finalize();
+    return 0;
+  }
+
   int numpong = 5000;
-
-  char *matrix_file_path = "../matrices/dimension_5_nonzeros_19.mtx";
-
-  int dim = getStandardMatrixDimension(matrix_file_path);
+  
+  int dim = getStandardMatrixDimension(argv[1]);
   double *matrix = malloc(dim * dim * sizeof(double));
-  getStandardMatrix(matrix_file_path, dim, matrix);
+  getStandardMatrix(argv[1], dim, matrix);
 
   // perform CSC pingpong timing
   CSC csc;
