@@ -15,8 +15,8 @@ void convertToCSC(CSC *csc, int n, int m, double *mat)
     }
 
     csc->values = malloc(nnz * sizeof(double));
-    csc->colptrs = malloc((m + 1) * sizeof(double));
-    csc->rows = malloc(nnz * sizeof(double));
+    csc->colptrs = malloc((m + 1) * sizeof(int));
+    csc->rows = malloc(nnz * sizeof(int));
     csc->nnz = nnz;
     csc->numColPtrs = 0;
 
