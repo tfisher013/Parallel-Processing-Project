@@ -20,12 +20,15 @@ void pingpongCOO(double *values, int *cols, int *rows, int nnz, int numpong, int
   void *buffer = malloc(buffer_size);
 
   // Pack the data once before the loop
-  int position = 0;
-  MPI_Pack(values, nnz, MPI_DOUBLE, buffer, buffer_size, &position, MPI_COMM_WORLD);
-  MPI_Pack(cols, nnz, MPI_INT, buffer, buffer_size, &position, MPI_COMM_WORLD);
-  MPI_Pack(rows, nnz, MPI_INT, buffer, buffer_size, &position, MPI_COMM_WORLD);
+  int position = 0; 
+  if (rank == 0) {
+  	MPI_Pack(values, nnz, MPI_DOUBLE, buffer, buffer_size, &position, MPI_COMM_WORLD);
+  	MPI_Pack(cols, nnz, MPI_INT, buffer, buffer_size, &position, MPI_COMM_WORLD);
+  	MPI_Pack(rows, nnz, MPI_INT, buffer, buffer_size, &position, MPI_COMM_WORLD);
+  }
   MPI_Barrier(MPI_COMM_WORLD);
   start_time = MPI_Wtime();
+  
 
   for (int i = 0; i < numpong; i++)
   {
@@ -60,9 +63,11 @@ void pingpongCSC(double *values, int *colptrs, int *rows, int nnz, int numpong, 
 
   // Pack the data once before the loop
   int position = 0;
+  if (rank == 0) {
   MPI_Pack(values, nnz, MPI_DOUBLE, buffer, buffer_size, &position, MPI_COMM_WORLD);
   MPI_Pack(colptrs, nnz + 1, MPI_INT, buffer, buffer_size, &position, MPI_COMM_WORLD);
   MPI_Pack(rows, nnz, MPI_INT, buffer, buffer_size, &position, MPI_COMM_WORLD);
+  }
   MPI_Barrier(MPI_COMM_WORLD);
   start_time = MPI_Wtime();
   for (int i = 0; i < numpong; i++)
@@ -97,9 +102,11 @@ void pingpongCSR(double *values, int *cols, int *rowptrs, int nnz, int numpong, 
 
   // Pack the data once before the loop
   int position = 0;
+  if (rank == 0) {
   MPI_Pack(values, nnz, MPI_DOUBLE, buffer, buffer_size, &position, MPI_COMM_WORLD);
   MPI_Pack(cols, nnz, MPI_INT, buffer, buffer_size, &position, MPI_COMM_WORLD);
   MPI_Pack(rowptrs, nnz + 1, MPI_INT, buffer, buffer_size, &position, MPI_COMM_WORLD);
+  }
   MPI_Barrier(MPI_COMM_WORLD);
   start_time = MPI_Wtime();
   for (int i = 0; i < numpong; i++)
@@ -128,38 +135,49 @@ int main(int argc, char *argv[])
   int rank, procs;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &procs);
-
-  if(argc < 1) {
-    printf("Please provide matrix file name as command line argument. Exiting.\n");
-    MPI_Finalize();
-    return 0;
-  }
-
+  char* matrices_100[] = {"../matrices/standardized_matrices/dimension_100_nonzeros_100.mtx",
+  			"../matrices/standardized_matrices/dimension_100_nonzeros_1090.mtx",
+  			"../matrices/standardized_matrices/dimension_100_nonzeros_2080.mtx",
+  			"../matrices/standardized_matrices/dimension_100_nonzeros_3070.mtx",
+  			"../matrices/standardized_matrices/dimension_100_nonzeros_4060.mtx",
+  			"../matrices/standardized_matrices/dimension_100_nonzeros_5050.mtx",
+  			"../matrices/standardized_matrices/dimension_100_nonzeros_6040.mtx",
+  			"../matrices/standardized_matrices/dimension_100_nonzeros_7030.mtx",
+  			"../matrices/standardized_matrices/dimension_100_nonzeros_8020.mtx",
+  			"../matrices/standardized_matrices/dimension_100_nonzeros_9010.mtx"};
   int numpong = 5000;
+  for(int i =0; i < 10; i++)
+  {
+    int dim = getStandardMatrixDimension(matrices_100[i]);
+    double *matrix = malloc(dim * dim * sizeof(double));
+    getStandardMatrix(matrices_100[i], dim, matrix);
+    //double density = ((double)coo.nnz) / (dim*dim);
+    
+    // perform CSC pingpong timing
+    CSC csc;
+    
+    convertToCSC(&csc, dim, dim, matrix);\
+    double density = ((double)csc.nnz) / (dim*dim);
+    if (rank == 0)
+    	printf("Matrix of Dimension %d x %d  and density %f\n", dim, dim, density);
+    pingpongCSC(csc.values, csc.colptrs, csc.rows, csc.nnz, numpong, rank, dim);
+    freeCSC(&csc);
   
-  int dim = getStandardMatrixDimension(argv[1]);
-  double *matrix = malloc(dim * dim * sizeof(double));
-  getStandardMatrix(argv[1], dim, matrix);
+    // perform COO pingpong timing
+    COO coo;
+    convertToCOO(&coo, dim, dim, matrix);
+    pingpongCOO(coo.values, coo.cols, coo.rows, coo.nnz, numpong, rank, dim);
+    freeCOO(&coo);
+  
+    CSR csr;
+    convertToCSR(&csr, dim, dim, matrix);
+    pingpongCSR(csr.values, csr.cols, csr.rowPtrs, csr.nnz, numpong, rank, dim);
+    freeCSR(&csr);
+    free(matrix);
+    if (rank == 0)
+    	printf("\n");	
+  } 
 
-  // perform CSC pingpong timing
-  CSC csc;
-  convertToCSC(&csc, dim, dim, matrix);
-  pingpongCSC(csc.values, csc.colptrs, csc.rows, csc.nnz, numpong, rank, dim);
-  freeCSC(&csc);
-
-  // perform COO pingpong timing
-  COO coo;
-  convertToCOO(&coo, dim, dim, matrix);
-  pingpongCOO(coo.values, coo.cols, coo.rows, coo.nnz, numpong, rank, dim);
-  freeCOO(&coo);
-
-  // perform CSR pingpong timing
-  CSR csr;
-  convertToCSR(&csr, dim, dim, matrix);
-  pingpongCSR(csr.values, csr.cols, csr.rowPtrs, csr.nnz, numpong, rank, dim);
-  freeCSR(&csr);
-
-  free(matrix);
 
   MPI_Finalize();
 }
