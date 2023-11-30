@@ -13,44 +13,49 @@ We will then pack the values and use ping pong
 */
 void pingpongCOO(double *values, int *cols, int *rows, int nnz, int numpong, int rank, int dim)
 {
-  double start_time, end_time;
-  // Pack parameters and perform numpong ping pongs
-  int buffer_size =
-      (nnz * (sizeof(double) + 2 * sizeof(int))) + MPI_BSEND_OVERHEAD;
-  void *buffer = malloc(buffer_size);
+    double start_time, end_time;
+    // Pack parameters and perform numpong ping pongs
+    int buffer_size = (nnz * (sizeof(double) + 2 * sizeof(int))) + MPI_BSEND_OVERHEAD;
+    void *buffer = malloc(buffer_size);
 
-  // Pack the data once before the loop
-  int position = 0; 
-  if (rank == 0) {
-  	MPI_Pack(values, nnz, MPI_DOUBLE, buffer, buffer_size, &position, MPI_COMM_WORLD);
-  	MPI_Pack(cols, nnz, MPI_INT, buffer, buffer_size, &position, MPI_COMM_WORLD);
-  	MPI_Pack(rows, nnz, MPI_INT, buffer, buffer_size, &position, MPI_COMM_WORLD);
-  }
-  MPI_Barrier(MPI_COMM_WORLD);
-  start_time = MPI_Wtime();
-  
-
-  for (int i = 0; i < numpong; i++)
-  {
-    if (rank == 0)
-    {
-      MPI_Send(buffer, position, MPI_PACKED, 1, 0, MPI_COMM_WORLD);
-      MPI_Recv(buffer, buffer_size, MPI_PACKED, 1, 0, MPI_COMM_WORLD,
-               MPI_STATUS_IGNORE);
+    int position = 0; 
+    if (rank == 0) {
+        MPI_Pack(values, nnz, MPI_DOUBLE, buffer, buffer_size, &position, MPI_COMM_WORLD);
+        MPI_Pack(cols, nnz, MPI_INT, buffer, buffer_size, &position, MPI_COMM_WORLD);
+        MPI_Pack(rows, nnz, MPI_INT, buffer, buffer_size, &position, MPI_COMM_WORLD);
     }
-    else
-    {
-      MPI_Recv(buffer, buffer_size, MPI_PACKED, 0, 0, MPI_COMM_WORLD,
-               MPI_STATUS_IGNORE);
-      MPI_Send(buffer, buffer_size, MPI_PACKED, 0, 0, MPI_COMM_WORLD);
-    }
-  }
+    MPI_Barrier(MPI_COMM_WORLD);
+    start_time = MPI_Wtime();
 
-  end_time = (MPI_Wtime() - start_time) / (2 * numpong);
-  MPI_Barrier(MPI_COMM_WORLD);
-  MPI_Reduce(&end_time, &start_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-  if (rank == 0)
-    printf("COO ping pong using %d iterations Time %e\n", numpong, start_time);
+    for (int i = 0; i < numpong; i++)
+    {
+        if (rank == 0)
+        {
+            MPI_Send(buffer, position, MPI_PACKED, 1, 0, MPI_COMM_WORLD);
+            MPI_Recv(buffer, buffer_size, MPI_PACKED, 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            position = 0;
+        }
+        else
+        {
+            MPI_Recv(buffer, buffer_size, MPI_PACKED, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+            position = 0;
+            MPI_Unpack(buffer, buffer_size, &position, values, nnz, MPI_DOUBLE, MPI_COMM_WORLD);
+            MPI_Unpack(buffer, buffer_size, &position, cols, nnz, MPI_INT, MPI_COMM_WORLD);
+            MPI_Unpack(buffer, buffer_size, &position, rows, nnz, MPI_INT, MPI_COMM_WORLD);
+
+            MPI_Send(buffer, buffer_size, MPI_PACKED, 0, 0, MPI_COMM_WORLD);
+        }
+    }
+
+    end_time = (MPI_Wtime() - start_time) / (2 * numpong);
+    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Reduce(&end_time, &start_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    if (rank == 0) {
+        printf("COO ping pong using %d iterations Time %e\n", numpong, start_time);
+    }
+
+    free(buffer);
 }
 
 void pingpongCSC(double *values, int *colptrs, int *rows, int nnz, int numpong, int rank, int dim)
@@ -64,9 +69,9 @@ void pingpongCSC(double *values, int *colptrs, int *rows, int nnz, int numpong, 
   // Pack the data once before the loop
   int position = 0;
   if (rank == 0) {
-  MPI_Pack(values, nnz, MPI_DOUBLE, buffer, buffer_size, &position, MPI_COMM_WORLD);
-  MPI_Pack(colptrs, nnz + 1, MPI_INT, buffer, buffer_size, &position, MPI_COMM_WORLD);
-  MPI_Pack(rows, nnz, MPI_INT, buffer, buffer_size, &position, MPI_COMM_WORLD);
+    MPI_Pack(values, nnz, MPI_DOUBLE, buffer, buffer_size, &position, MPI_COMM_WORLD);
+    MPI_Pack(colptrs, nnz + 1, MPI_INT, buffer, buffer_size, &position, MPI_COMM_WORLD);
+    MPI_Pack(rows, nnz, MPI_INT, buffer, buffer_size, &position, MPI_COMM_WORLD);
   }
   MPI_Barrier(MPI_COMM_WORLD);
   start_time = MPI_Wtime();
@@ -75,13 +80,19 @@ void pingpongCSC(double *values, int *colptrs, int *rows, int nnz, int numpong, 
     if (rank == 0)
     {
       MPI_Send(buffer, position, MPI_PACKED, 1, 0, MPI_COMM_WORLD);
-      MPI_Recv(buffer, buffer_size, MPI_PACKED, 1, 0, MPI_COMM_WORLD,
-               MPI_STATUS_IGNORE);
+      MPI_Recv(buffer, buffer_size, MPI_PACKED, 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      position = 0;
     }
     else
     {
       MPI_Recv(buffer, buffer_size, MPI_PACKED, 0, 0, MPI_COMM_WORLD,
                MPI_STATUS_IGNORE);
+
+      position = 0;
+      MPI_Unpack(buffer, buffer_size, &position, values, nnz, MPI_DOUBLE, MPI_COMM_WORLD);
+      MPI_Unpack(buffer, buffer_size, &position, colptrs, nnz+1, MPI_INT, MPI_COMM_WORLD);
+      MPI_Unpack(buffer, buffer_size, &position, rows, nnz, MPI_INT, MPI_COMM_WORLD);
+      
       MPI_Send(buffer, buffer_size, MPI_PACKED, 0, 0, MPI_COMM_WORLD);
     }
   }
@@ -90,6 +101,8 @@ void pingpongCSC(double *values, int *colptrs, int *rows, int nnz, int numpong, 
   MPI_Reduce(&end_time, &start_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
   if (rank == 0)
     printf("CSC ping pong using %d iterations Time %e\n", numpong, start_time);
+  
+  free(buffer);
 }
 
 void pingpongCSR(double *values, int *cols, int *rowptrs, int nnz, int numpong, int rank, int dim)
@@ -103,9 +116,9 @@ void pingpongCSR(double *values, int *cols, int *rowptrs, int nnz, int numpong, 
   // Pack the data once before the loop
   int position = 0;
   if (rank == 0) {
-  MPI_Pack(values, nnz, MPI_DOUBLE, buffer, buffer_size, &position, MPI_COMM_WORLD);
-  MPI_Pack(cols, nnz, MPI_INT, buffer, buffer_size, &position, MPI_COMM_WORLD);
-  MPI_Pack(rowptrs, nnz + 1, MPI_INT, buffer, buffer_size, &position, MPI_COMM_WORLD);
+    MPI_Pack(values, nnz, MPI_DOUBLE, buffer, buffer_size, &position, MPI_COMM_WORLD);
+    MPI_Pack(cols, nnz, MPI_INT, buffer, buffer_size, &position, MPI_COMM_WORLD);
+    MPI_Pack(rowptrs, nnz + 1, MPI_INT, buffer, buffer_size, &position, MPI_COMM_WORLD);
   }
   MPI_Barrier(MPI_COMM_WORLD);
   start_time = MPI_Wtime();
@@ -115,10 +128,17 @@ void pingpongCSR(double *values, int *cols, int *rowptrs, int nnz, int numpong, 
     {
       MPI_Send(buffer, position, MPI_PACKED, 1, 0, MPI_COMM_WORLD);
       MPI_Recv(buffer, buffer_size, MPI_PACKED, 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      position = 0;
     }
     else
     {
       MPI_Recv(buffer, buffer_size, MPI_PACKED, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+      position = 0;
+      MPI_Unpack(buffer, buffer_size, &position, values, nnz, MPI_DOUBLE, MPI_COMM_WORLD);
+      MPI_Unpack(buffer, buffer_size, &position, cols, nnz, MPI_INT, MPI_COMM_WORLD);
+      MPI_Unpack(buffer, buffer_size, &position, rowptrs, nnz+1, MPI_INT, MPI_COMM_WORLD);
+      
       MPI_Send(buffer, buffer_size, MPI_PACKED, 0, 0, MPI_COMM_WORLD);
     }
   }
@@ -127,6 +147,7 @@ void pingpongCSR(double *values, int *cols, int *rowptrs, int nnz, int numpong, 
   MPI_Reduce(&end_time, &start_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
   if (rank == 0)
     printf("CSR ping pong using %d iterations Time %e\n", numpong, start_time);
+  free(buffer);
 }
 
 int main(int argc, char *argv[])
