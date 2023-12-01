@@ -1,0 +1,126 @@
+desc: --massif-out-file=analysis_files/CSR/csr_dimension_100_nonzeros_6040_massif_instructions --time-unit=i
+cmd: ./profiler_analysis ../../matrices/standardized_matrices/dimension_100_nonzeros_6040.mtx
+time_unit: i
+#-----------
+snapshot=0
+#-----------
+time=0
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=1
+#-----------
+time=123832
+mem_heap_B=568
+mem_heap_extra_B=16
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=2
+#-----------
+time=128407
+mem_heap_B=80568
+mem_heap_extra_B=24
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=3
+#-----------
+time=128472
+mem_heap_B=81136
+mem_heap_extra_B=40
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=4
+#-----------
+time=10368892
+mem_heap_B=81136
+mem_heap_extra_B=40
+mem_stacks_B=0
+heap_tree=detailed
+n2: 81136 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n0: 80000 0x401468: main (in /users/dfisher/CS_542/Parallel-Processing-Project/storage_analysis/profiler_memory_analysis/profiler_analysis)
+ n1: 1136 0x4EA1C4C: __fopen_internal (iofopen.c:69)
+  n0: 1136 in 2 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=5
+#-----------
+time=10368892
+mem_heap_B=80568
+mem_heap_extra_B=24
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=6
+#-----------
+time=10575828
+mem_heap_B=128384
+mem_heap_extra_B=40
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=7
+#-----------
+time=10575869
+mem_heap_B=152292
+mem_heap_extra_B=60
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=8
+#-----------
+time=10575911
+mem_heap_B=152696
+mem_heap_extra_B=80
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=9
+#-----------
+time=10934422
+mem_heap_B=152696
+mem_heap_extra_B=80
+mem_stacks_B=0
+heap_tree=peak
+n4: 152696 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n0: 80000 0x401468: main (in /users/dfisher/CS_542/Parallel-Processing-Project/storage_analysis/profiler_memory_analysis/profiler_analysis)
+ n1: 47816 0x400BC7: convertToCSR (in /users/dfisher/CS_542/Parallel-Processing-Project/storage_analysis/profiler_memory_analysis/profiler_analysis)
+  n0: 47816 0x40149E: main (in /users/dfisher/CS_542/Parallel-Processing-Project/storage_analysis/profiler_memory_analysis/profiler_analysis)
+ n1: 23908 0x400BE2: convertToCSR (in /users/dfisher/CS_542/Parallel-Processing-Project/storage_analysis/profiler_memory_analysis/profiler_analysis)
+  n0: 23908 0x40149E: main (in /users/dfisher/CS_542/Parallel-Processing-Project/storage_analysis/profiler_memory_analysis/profiler_analysis)
+ n0: 972 in 2 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=10
+#-----------
+time=10934422
+mem_heap_B=104880
+mem_heap_extra_B=64
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=11
+#-----------
+time=10934454
+mem_heap_B=104476
+mem_heap_extra_B=44
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=12
+#-----------
+time=10934486
+mem_heap_B=80568
+mem_heap_extra_B=24
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=13
+#-----------
+time=10934519
+mem_heap_B=568
+mem_heap_extra_B=16
+mem_stacks_B=0
+heap_tree=empty
