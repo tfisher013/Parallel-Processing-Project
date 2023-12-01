@@ -5,9 +5,9 @@
 void convertToCSR(CSR *csr, int n, int m, double *mat)
 {
     int nnz = 0;
-    for (int i = 1; i <= n; i++)
+    for (int i = 0; i < n; i++)
     {
-        for (int j = 1; j <= m; j++)
+        for (int j = 0; j < m; j++)
         {
             if (mat[i * n + j] != 0)
                 nnz++;
@@ -21,11 +21,11 @@ void convertToCSR(CSR *csr, int n, int m, double *mat)
     csr->numRowPtrs = 0;
 
     int k = 0;
-    for (int i = 1; i <= n; i++)
+    for (int i = 0; i < n; i++)
     {
         csr->rowPtrs[i] = k;
         csr->numRowPtrs++;
-        for (int j = 1; j <= m; j++)
+        for (int j = 0; j < m; j++)
         {
             if (mat[i * n + j] != 0)
             {

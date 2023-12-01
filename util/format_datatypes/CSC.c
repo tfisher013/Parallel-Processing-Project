@@ -5,9 +5,9 @@
 void convertToCSC(CSC *csc, int n, int m, double *mat)
 {
     int nnz = 0;
-    for (int i = 1; i <= n; i++)
+    for (int i = 0; i < n; i++)
     {
-        for (int j = 1; j <= m; j++)
+        for (int j = 0; j < m; j++)
         {
             if (mat[i * n + j] != 0)
                 nnz++;
@@ -21,11 +21,11 @@ void convertToCSC(CSC *csc, int n, int m, double *mat)
     csc->numColPtrs = 0;
 
     int k = 0;
-    for (int j = 1; j <= m; j++)
+    for (int j = 0; j < m; j++)
     {
         csc->colptrs[j] = k;
         csc->numColPtrs++;
-        for (int i = 1; i <= n; i++)
+        for (int i = 0; i < n; i++)
         {
             if (mat[i * n + j] != 0)
             {
