@@ -14,3 +14,7 @@ mpirun -n 2 pingpongtests ../matrices/downloaded_matrices/dimension_5_nonzeros_1
 
 mpirun -n 2 --oversubscribe pingpongtests ../matrices/downloaded_matrices/dimension_5_n
 onzeros_19.mtx
+
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+
