@@ -1,0 +1,106 @@
+desc: --massif-out-file=analysis_files/dense/dense_dimension_1000_nonzeros_200800_massif_instructions --time-unit=i
+cmd: ./profiler_analysis ../../matrices/standardized_matrices/dimension_1000_nonzeros_200800.mtx
+time_unit: i
+#-----------
+snapshot=0
+#-----------
+time=0
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=1
+#-----------
+time=123819
+mem_heap_B=568
+mem_heap_extra_B=16
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=2
+#-----------
+time=128417
+mem_heap_B=8000568
+mem_heap_extra_B=3544
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=3
+#-----------
+time=128482
+mem_heap_B=8001136
+mem_heap_extra_B=3560
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=4
+#-----------
+time=351066809
+mem_heap_B=8001136
+mem_heap_extra_B=3560
+mem_stacks_B=0
+heap_tree=detailed
+n2: 8001136 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n0: 8000000 0x401468: main (in /users/dfisher/CS_542/Parallel-Processing-Project/storage_analysis/profiler_memory_analysis/profiler_analysis)
+ n0: 1136 in 1 place, below massif's threshold (1.00%)
+#-----------
+snapshot=5
+#-----------
+time=351066809
+mem_heap_B=8000568
+mem_heap_extra_B=3544
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=6
+#-----------
+time=351066850
+mem_heap_B=16000568
+mem_heap_extra_B=7072
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=7
+#-----------
+time=351066915
+mem_heap_B=16001136
+mem_heap_extra_B=7088
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=8
+#-----------
+time=702003452
+mem_heap_B=16001136
+mem_heap_extra_B=7088
+mem_stacks_B=0
+heap_tree=peak
+n3: 16001136 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n0: 8000000 0x401468: main (in /users/dfisher/CS_542/Parallel-Processing-Project/storage_analysis/profiler_memory_analysis/profiler_analysis)
+ n0: 8000000 0x40149D: main (in /users/dfisher/CS_542/Parallel-Processing-Project/storage_analysis/profiler_memory_analysis/profiler_analysis)
+ n0: 1136 in 1 place, below massif's threshold (1.00%)
+#-----------
+snapshot=9
+#-----------
+time=702003452
+mem_heap_B=16000568
+mem_heap_extra_B=7072
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=10
+#-----------
+time=702004331
+mem_heap_B=8000568
+mem_heap_extra_B=3544
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=11
+#-----------
+time=702004362
+mem_heap_B=568
+mem_heap_extra_B=16
+mem_stacks_B=0
+heap_tree=empty

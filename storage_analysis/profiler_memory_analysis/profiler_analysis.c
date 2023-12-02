@@ -38,6 +38,11 @@ int main(int argc, char *argv[])
     convertToCSC(&csc, dim, dim, matrix);
     freeCSC(&csc);
 
+    // profile memory usage of dense storage
+    double *matrix2 = malloc(dim * dim * sizeof(double));
+    getStandardMatrix(argv[1], dim, matrix2);
+    free(matrix2);
+
     free(matrix);
 
     printf("done\n");

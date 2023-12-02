@@ -1,0 +1,39 @@
+desc: --massif-out-file=analysis_files/dense/dense_dimension_1000_nonzeros_500500_massif_instructions --time-unit=i
+cmd: ./profiler_analysis ../../matrices/standardized_matrices/dimension_1000_nonzeros_500500.mtx
+time_unit: i
+#-----------
+snapshot=0
+#-----------
+time=0
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=1
+#-----------
+time=123819
+mem_heap_B=568
+mem_heap_extra_B=16
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=2
+#-----------
+time=124180
+mem_heap_B=568
+mem_heap_extra_B=16
+mem_stacks_B=0
+heap_tree=peak
+n1: 568 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 568 0x4EA1C4C: __fopen_internal (iofopen.c:69)
+  n1: 568 0x40121C: getStandardMatrixDimension (in /users/dfisher/CS_542/Parallel-Processing-Project/storage_analysis/profiler_memory_analysis/profiler_analysis)
+   n0: 568 0x401450: main (in /users/dfisher/CS_542/Parallel-Processing-Project/storage_analysis/profiler_memory_analysis/profiler_analysis)
+#-----------
+snapshot=3
+#-----------
+time=124180
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
