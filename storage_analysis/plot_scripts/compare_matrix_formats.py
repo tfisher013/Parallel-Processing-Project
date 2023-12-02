@@ -11,10 +11,12 @@ DOUBLE_SIZE = 8
 # set this depending on whether the matrix is holding integers, floats, etc.
 MATRIX_ELEMENT_SIZE = DOUBLE_SIZE
 
+# specifies the number of densities sampled between [1/dim, 1]
+NUM_DENSITY_INTERVALS = 10
+
 val_type = "integer" if MATRIX_ELEMENT_SIZE == INTEGER_SIZE else "double"
 
-dims = [1000, 10000, 100000]
-densities = [0.05, 0.25, 0.5, 0.75, 1.0]
+dims = [100, 1000]
 
 for dim in dims:
 
@@ -22,8 +24,11 @@ for dim in dims:
     csr_vals = []
     csc_vals = []
     dense_vals = []
+    densities = []
 
-    for density in densities:
+    for i in range(NUM_DENSITY_INTERVALS):
+        density = (1.0 / dim) + i * ((1 - (1.0 / dim))) / (NUM_DENSITY_INTERVALS)
+        densities.append(density)
 
         # see storage analysis pdf in repo for where these formulae are derived
         coo_val = (2 * density * (dim ** 2)) * INTEGER_SIZE + (density * (dim ** 2)) * MATRIX_ELEMENT_SIZE
@@ -35,13 +40,11 @@ for dim in dims:
         dense_vals.append(dense_val)
 
     plt.figure(dims.index(dim) + 1)
-    plt.title('Matrix Format Storage Requirements (N = '+'{:,}'.format(dim)+')')
+    plt.title('Theoretical Matrix Format Storage Requirements (N = '+'{:,}'.format(dim)+')')
     plt.xlabel('Matrix Density')
     plt.ylabel('Storage (bytes)')
-    plt.plot(densities, coo_vals, label='COO Format')
-    plt.plot(densities, csr_vals, label='CSR Format')
-    plt.plot(densities, dense_vals, label='Dense Format')
+    plt.plot(densities, dense_vals, label='Dense Format', color='blue')
+    plt.plot(densities, coo_vals, label='COO Format', color='orange')
+    plt.plot(densities, csr_vals, label='CSR Format', color='green')
     plt.legend()
-    plt.subplots_adjust(bottom=0.15)
-    plt.figtext(0.25, 0.01, 'Matrix contains values of type '+val_type, ha="center", fontsize=10)
 plt.show()
