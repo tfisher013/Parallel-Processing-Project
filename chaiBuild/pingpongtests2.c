@@ -6,10 +6,58 @@
 #include "../util/format_datatypes/CSR.h"
 #include "../util/format_datatypes/CSC.h"
 
+
+/*
+Perform pingpongs on a dense matrix, this will be a good place to compare how well COO, CSC, and CSR perform. 
+*/
+void pingpongDenseMatrix(double *matrix, int dim, int numpong, int rank)
+{
+    double start_time, end_time;
+
+    // The size of the matrix is dim * dim
+    int matrix_size = dim * dim;
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    start_time = MPI_Wtime();
+
+    for (int i = 0; i < numpong; i++)
+    {
+        if (rank == 0)
+        {
+            // Process 0 sends the matrix to process 1
+            MPI_Send(matrix, matrix_size, MPI_DOUBLE, 1, 0, MPI_COMM_WORLD);
+		
+            // Then receives the same matrix back from process 1
+            MPI_Recv(matrix, matrix_size, MPI_DOUBLE, 1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        }
+        else
+        {
+            // Process 1 receives the matrix from process 0
+            MPI_Recv(matrix, matrix_size, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		
+            // Then sends it back to process 0
+            MPI_Send(matrix, matrix_size, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD);
+        }
+    }
+
+    end_time = (MPI_Wtime() - start_time) / (2 * numpong);
+    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Reduce(&end_time, &start_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+
+    if (rank == 0)
+    {
+        printf("Dense matrix ping pong using %d iterations Time %e\n", numpong, start_time);
+    }
+}
+
+
+
+
+
+
 /*
 First we will populate the COO and pass the values into this function from main.
 We will then pack the values and use ping pong
-
 */
 void pingpongCOO(double *values, int *cols, int *rows, int nnz, int numpong, int rank, int dim)
 {
@@ -211,6 +259,9 @@ int main(int argc, char *argv[])
     int dim = getStandardMatrixDimension(matrices_100[i]);
     double *matrix = calloc(dim * dim, sizeof(double));
     getStandardMatrix(matrices_100[i], dim, matrix);
+    //Do I need a barrier here? 
+
+    
 
     // perform CSC pingpong timing
     CSC csc;
@@ -236,9 +287,15 @@ int main(int argc, char *argv[])
     convertToCSR(&csr, dim, dim, matrix);
     pingpongCSR(csr.values, csr.cols, csr.rowPtrs, csr.nnz, numpong, rank, dim);
     freeCSR(&csr);
-    free(matrix);
-
+   
     MPI_Barrier(MPI_COMM_WORLD);
+
+    // perform Dense ping pong timings
+	 
+    pingpongDenseMatrix(matrix, dim, numpong, rank);
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    free(matrix);
 
     if (rank == 0)
       printf("\n");
