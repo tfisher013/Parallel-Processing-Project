@@ -6,7 +6,7 @@
 #include "../util/format_datatypes/CSR.h"
 #include "../util/format_datatypes/CSC.h"
 
-void matmat(int *rows, int *cols, double *vals, int rank, int dim, int nnz){
+void matmat(COO *coo_A, COO *coo_B, int rank, int dim){
 
     int proc_offset_A, proc_offset_B;
     if(rank == 0){
@@ -14,17 +14,17 @@ void matmat(int *rows, int *cols, double *vals, int rank, int dim, int nnz){
         proc_offset_B = 0;
     }
     else{
-        proc_offset_A = n/2;
-        proc_offset_B = n/2;
+        proc_offset_A = dim/2;
+        proc_offset_B = dim/2;
     }
 
     int non_zero_val_counter = 0;
     for(int i = 0; i<2; i++){
-        for(int row = proc_offset_A, row < proc_offset_A+ n/2; row++){
-            for(int col = proc_offset_B, col < proc_offset_B + n/2 ; col++){
+        for(int row = proc_offset_A; row < proc_offset_A+ dim/2; row++){
+            for(int col = proc_offset_B; col < proc_offset_B + dim/2 ; col++){
                 double tmp;
                 int A_val_index, B_val_index;
-                for(int j=0; j < n ; j++){
+                for(int j=0; j < dim ; j++){
                     for(int k=0; k < coo_A.nnz; k++){
                         if (coo_A.rows[k] = row && coo_A.cols[k] == j){
                             A_val_index = k;
@@ -48,7 +48,7 @@ void matmat(int *rows, int *cols, double *vals, int rank, int dim, int nnz){
         }
         MPI_Barrier(MPI_COMM_WORLD);
         if(rank ==0){
-            proc_offset_B = n/2;
+            proc_offset_B = dim/2;
         }
         else{
             proc_offset_B = 0;
@@ -57,7 +57,7 @@ void matmat(int *rows, int *cols, double *vals, int rank, int dim, int nnz){
 }
 
 
-int main(int argc, &argv){
+int main(int argc, char *argv[]){
     MPI_Init(&argc,&argv);
     int rank, num_procs;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -87,36 +87,52 @@ int main(int argc, &argv){
                         "../matrices/standardized_matrices/dimension_1000_nonzeros_900100.mtx"};
 
 
-for (int i = 0; i < 10; i++)
+for (int i = 0; i < 10; i=i+2)
   {
     int dim = getStandardMatrixDimension(matrices_100[i]);
-    double *matrix = calloc(dim * dim, sizeof(double));
-    getStandardMatrix(matrices_100[i], dim, matrix);
+    double *matrix_A = calloc(dim * dim, sizeof(double));
+    double *matrix_B = calloc(dim * dim, sizeof(double));
 
-    // perform CSC pingpong timing
-    CSC csc;
-    convertToCSC(&csc, dim, dim, matrix);
-    double density = csc.nnz / ((double) dim * dim);
-    if(rank == 0){
-        printf("Rank %d has Matrix of Dimension %d x %d and density %e and nnz %d and name %s\n", rank, dim, dim, density, csc.nnz, matrices_100[i]);
-    }
-    matmat(csc.values, csc.colptrs, csc.rows, csc.nnz, numpong, rank, dim);
-    freeCSC(&csc);
+    getStandardMatrix(matrices_100[i], dim, matrix_A);
+//Might need a barrier here
+    getStandardMatrix(matrices_100[i+1], dim, matrix_B);
+//Might need a barrier here
 
-    MPI_Barrier(MPI_COMM_WORLD);
 
-    // perform COO pingpong timing
-    COO coo;
-    convertToCOO(&coo, dim, dim, matrix);
-    matmat(coo.values, coo.cols, coo.rows, coo.nnz, numpong, rank, dim);
+    // perform COO matmul timing
+    COO coo_A;
+    COO coo_B;
+    convertToCOO(&coo_A, dim, dim, matrix_A);
+    convertToCOO(&coo_B, dim, dim, matrix_B);
+    matmat(&coo_A, &coo_B, rank, dim);
     freeCOO(&coo);
 
     MPI_Barrier(MPI_COMM_WORLD);
 
+
+    // perform CSC matmul timing
+    CSC csc_A;
+    CSC csc_B;
+    convertToCSC(&csc_A, dim, dim, matrix_A);
+    convertToCSC(&csc_B, dim, dim, matrix_B);
+    
+    double density = csc.nnz / ((double) dim * dim);
+    if(rank == 0){
+        printf("Rank %d has Matrix A of Dimension %d x %d and density %e and nnz %d and name %s\n", rank, dim, dim, density, csc.nnz, matrices_100[i]);
+        printf("Rank %d has Matrix B of Dimension %d x %d and density %e and nnz %d and name %s\n", rank, dim, dim, density, csc.nnz, matrices_100[i+1]);
+
+    }
+    matmat(CSC csc_A, CSC csc_B, rank, dim);
+    freeCSC(&csc);
+
+    MPI_Barrier(MPI_COMM_WORLD);
+
     // perform CSR pingpong timing
-    CSR csr;
-    convertToCSR(&csr, dim, dim, matrix);
-    matmat(csr.values, csr.cols, csr.rowPtrs, csr.nnz, numpong, rank, dim);
+    CSR csr_A;
+    CSR csr_B;
+    convertToCSR(&csr_A, dim, dim, matrix_A);
+    convertToCSR(&csr_B, dim, dim, matrix_B);
+    matmat(&csr_A,&csr_B, rank, dim);
     freeCSR(&csr);
     free(matrix);
 
