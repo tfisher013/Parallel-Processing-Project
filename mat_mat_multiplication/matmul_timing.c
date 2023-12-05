@@ -6,7 +6,7 @@
 #include "../util/format_datatypes/CSR.h"
 #include "../util/format_datatypes/CSC.h"
 
-void matmat(COO *coo_A, COO *coo_B, int rank, int dim){
+void matmat(COO *coo_A, COO *coo_B, COO *coo_C, int rank, int dim){
 
     int proc_offset_A, proc_offset_B;
     if(rank == 0){
@@ -25,24 +25,25 @@ void matmat(COO *coo_A, COO *coo_B, int rank, int dim){
                 double tmp;
                 int A_val_index, B_val_index;
                 for(int j=0; j < dim ; j++){
-                    for(int k=0; k < coo_A.nnz; k++){
-                        if (coo_A.rows[k] = row && coo_A.cols[k] == j){
+                    for(int k=0; k < coo_A->nnz; k++){
+                        if (coo_A->rows[k] = row && coo_A->cols[k] == j){
                             A_val_index = k;
                             if(B_val_index != 0){break;}
                         }
-                        if (coo_B.rows[k]==j && coo_B.cols[k] = col){
+                        if (coo_B->rows[k]==j && coo_B->cols[k] == col){
                             B_val_index = k;
                             if(A_val_index != 0) { break;}
                         }
                     }
 
                     if(A_val_index && B_val_index){
-                        tmp += coo_A.vals[A_val_index] * coo_B.vals[B_val_index];
+                        tmp += coo_A->values[A_val_index] * coo_B->values[B_val_index];
+			printf("temp value is %f\n",tmp);
                     }
                 }
-                coo_C.cols[non_zero_val_counter] = col;
-                coo_C.rows[non_zero_val_counter] = row;
-                coo_C.vals[non_zero_val_counter] = tmp;
+                coo_C->cols[non_zero_val_counter] = col;
+                coo_C->rows[non_zero_val_counter] = row;
+                coo_C->values[non_zero_val_counter] = tmp;
                 non_zero_val_counter++;
             }
         }
@@ -92,7 +93,7 @@ for (int i = 0; i < 10; i=i+2)
     int dim = getStandardMatrixDimension(matrices_100[i]);
     double *matrix_A = calloc(dim * dim, sizeof(double));
     double *matrix_B = calloc(dim * dim, sizeof(double));
-
+    double *matrix_C = calloc(dim * dim, sizeof(double));
     getStandardMatrix(matrices_100[i], dim, matrix_A);
 //Might need a barrier here
     getStandardMatrix(matrices_100[i+1], dim, matrix_B);
@@ -102,14 +103,19 @@ for (int i = 0; i < 10; i=i+2)
     // perform COO matmul timing
     COO coo_A;
     COO coo_B;
+    COO coo_C;
+
     convertToCOO(&coo_A, dim, dim, matrix_A);
     convertToCOO(&coo_B, dim, dim, matrix_B);
-    matmat(&coo_A, &coo_B, rank, dim);
-    freeCOO(&coo);
+    convertToCOO(&coo_C, dim, dim, matrix_C);
+    matmat(&coo_A, &coo_B, &coo_C, rank, dim);
+    freeCOO(&coo_A);
+    freeCOO(&coo_B);
+    freeCOO(&coo_C);
 
     MPI_Barrier(MPI_COMM_WORLD);
 
-
+/*
     // perform CSC matmul timing
     CSC csc_A;
     CSC csc_B;
@@ -135,7 +141,7 @@ for (int i = 0; i < 10; i=i+2)
     matmat(&csr_A,&csr_B, rank, dim);
     freeCSR(&csr);
     free(matrix);
-
+*/
     MPI_Barrier(MPI_COMM_WORLD);
 
     if (rank == 0)
