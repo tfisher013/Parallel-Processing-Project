@@ -1,0 +1,23 @@
+/usr/bin/ld: skipping incompatible /usr/lib/libpthread.so when searching for -lpthread
+/usr/bin/ld: skipping incompatible /usr/lib/libc.so when searching for -lc
+srun: Warning: can't honor --ntasks-per-node set to 7 which doesn't match the requested tasks 25 with the number of requested nodes 4. Ignoring --ntasks-per-node.
+Sparce Mat. Transpose, procs: 25
+Matrix: 0, Avg. Time: 0.001095 seconds
+Matrix: 1, Avg. Time: 0.000259 seconds
+Matrix: 2, Avg. Time: 0.000068 seconds
+Matrix: 3, Avg. Time: 0.000102 seconds
+Matrix: 4, Avg. Time: 0.000137 seconds
+Matrix: 5, Avg. Time: 0.000137 seconds
+Matrix: 6, Avg. Time: 0.000137 seconds
+Matrix: 7, Avg. Time: 0.000136 seconds
+Matrix: 8, Avg. Time: 0.000136 seconds
+Matrix: 9, Avg. Time: 0.000138 seconds
+Matrix: 10, Avg. Time: 0.002280 seconds
+Matrix: 11, Avg. Time: 0.004051 seconds
+Matrix: 12, Avg. Time: 0.007128 seconds
+Matrix: 13, Avg. Time: 0.010960 seconds
+Matrix: 14, Avg. Time: 0.014636 seconds
+Matrix: 15, Avg. Time: 0.017932 seconds
+Matrix: 16, Avg. Time: 0.021191 seconds
+Matrix: 17, Avg. Time: 0.024487 seconds
+Matrix: 18, Avg. Time: 0.029000 seconds

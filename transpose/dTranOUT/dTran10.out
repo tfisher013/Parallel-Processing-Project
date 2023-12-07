@@ -1,0 +1,22 @@
+/usr/bin/ld: skipping incompatible /usr/lib/libpthread.so when searching for -lpthread
+/usr/bin/ld: skipping incompatible /usr/lib/libc.so when searching for -lc
+Dense Mat. Transpose, procs: 10
+Matrix: 0, Avg. Time: 0.001105 seconds
+Matrix: 1, Avg. Time: 0.000254 seconds
+Matrix: 2, Avg. Time: 0.000254 seconds
+Matrix: 3, Avg. Time: 0.000256 seconds
+Matrix: 4, Avg. Time: 0.000254 seconds
+Matrix: 5, Avg. Time: 0.000255 seconds
+Matrix: 6, Avg. Time: 0.001405 seconds
+Matrix: 7, Avg. Time: 0.000254 seconds
+Matrix: 8, Avg. Time: 0.000254 seconds
+Matrix: 9, Avg. Time: 0.000255 seconds
+Matrix: 10, Avg. Time: 0.295079 seconds
+Matrix: 11, Avg. Time: 0.192716 seconds
+Matrix: 12, Avg. Time: 0.200598 seconds
+Matrix: 13, Avg. Time: 0.152913 seconds
+Matrix: 14, Avg. Time: 1.801982 seconds
+Matrix: 15, Avg. Time: 0.132789 seconds
+Matrix: 16, Avg. Time: 0.132948 seconds
+Matrix: 17, Avg. Time: 0.133189 seconds
+Matrix: 18, Avg. Time: 0.239405 seconds
