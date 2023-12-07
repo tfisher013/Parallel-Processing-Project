@@ -105,8 +105,8 @@ int main(int argc, char *argv[])
                 }
             }
 
-            MPI_Send(matrix_A, dim * dim / procs, MPI_INT, i, 1234, MPI_COMM_WORLD);
-            MPI_Send(matrix_B, dim * dim / procs, MPI_INT, i, 5678, MPI_COMM_WORLD);
+            MPI_Send(matrix_A, dim * dim / procs, MPI_DOUBLE, i, 1234, MPI_COMM_WORLD);
+            MPI_Send(matrix_B, dim * dim / procs, MPI_DOUBLE, i, 5678, MPI_COMM_WORLD);
         }
 
         // root process finally creates it own partition
@@ -124,8 +124,8 @@ int main(int argc, char *argv[])
     }
     else
     {
-        MPI_Recv(matrix_A, dim * dim / procs, MPI_INT, 0, 1234, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        MPI_Recv(matrix_B, dim * dim / procs, MPI_INT, 0, 5678, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Recv(matrix_A, dim * dim / procs, MPI_DOUBLE, 0, 1234, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Recv(matrix_B, dim * dim / procs, MPI_DOUBLE, 0, 5678, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     }
 
     COO coo_A, coo_B, coo_C;
