@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "../../util/parse_matrix_file/read_matrix_file.h"
-#include "../../util/format_datatypes/COO.h"
-#include "../../util/format_datatypes/CSR.h"
+#include "../util/parse_matrix_file/read_matrix_file.h"
+#include "../util/format_datatypes/COO.h"
+#include "../util/format_datatypes/CSR.h"
 
 void matmatCSR(CSR *csr_A, CSR *csr_B, int dim){
 
@@ -38,7 +38,7 @@ void matmatCSR(CSR *csr_A, CSR *csr_B, int dim){
                         tmp += csr_A->values[A_val_index] * csr_B->values[B_val_index];
                     }
                 }
-                printf("The value at row %d and col %d is %f\n", row, col, tmp);
+               // printf("The value at row %d and col %d is %f\n", row, col, tmp);
                 non_zero_val_counter++;
             }
         }
@@ -70,7 +70,7 @@ void matmatCOO(COO *coo_A, COO *coo_B, int dim){
                         tmp += coo_A->values[A_val_index] * coo_B->values[B_val_index];
                     }
                 }
-                printf("The value at row %d and col %d is %f\n", row, col, tmp);
+               // printf("The value at row %d and col %d is %f\n", row, col, tmp);
                 non_zero_val_counter++;
             }
         }
@@ -79,7 +79,32 @@ void matmatCOO(COO *coo_A, COO *coo_B, int dim){
 
 int main(int argc, char *argv[]){
 
-    char *filename = "identity2.mtx";
+    char *matrices_100[] = {"../matrices/standardized_matrices/dimension_100_nonzeros_100.mtx",
+                        "../matrices/standardized_matrices/dimension_100_nonzeros_1090.mtx",
+                        "../matrices/standardized_matrices/dimension_100_nonzeros_2080.mtx",
+                        "../matrices/standardized_matrices/dimension_100_nonzeros_3070.mtx",
+                        "../matrices/standardized_matrices/dimension_100_nonzeros_4060.mtx",
+                        "../matrices/standardized_matrices/dimension_100_nonzeros_5050.mtx",
+                        "../matrices/standardized_matrices/dimension_100_nonzeros_6040.mtx",
+                        "../matrices/standardized_matrices/dimension_100_nonzeros_7030.mtx",
+                        "../matrices/standardized_matrices/dimension_100_nonzeros_8020.mtx",
+                        "../matrices/standardized_matrices/dimension_100_nonzeros_9010.mtx"};
+                        
+
+   char *matrices_1000[] = {
+                        "../matrices/standardized_matrices/dimension_1000_nonzeros_1000.mtx",
+                        "../matrices/standardized_matrices/dimension_1000_nonzeros_100900.mtx",
+                        "../matrices/standardized_matrices/dimension_1000_nonzeros_200800.mtx",
+                        "../matrices/standardized_matrices/dimension_1000_nonzeros_300700.mtx",
+                        "../matrices/standardized_matrices/dimension_1000_nonzeros_400600.mtx",
+                        "../matrices/standardized_matrices/dimension_1000_nonzeros_500499.mtx",
+                        "../matrices/standardized_matrices/dimension_1000_nonzeros_600400.mtx",
+                        "../matrices/standardized_matrices/dimension_1000_nonzeros_700300.mtx",
+                        "../matrices/standardized_matrices/dimension_1000_nonzeros_800200.mtx",
+                        "../matrices/standardized_matrices/dimension_1000_nonzeros_900100.mtx"};
+
+   for(int i =0; i<10; i++){
+    char *filename = matrices_100[i];
     int dim = getStandardMatrixDimension(filename);
     double *matrix_A = calloc(dim * dim, sizeof(double));
     //double *matrix_B = calloc(dim * dim, sizeof(double));
@@ -95,10 +120,42 @@ int main(int argc, char *argv[]){
     convertToCSR(&csr_A, dim, dim, matrix_A);
     //printCOO(&coo_A);
     //convertToCOO(&coo_B, dim, dim, matrix_B);
-    matmatCSR(&csr_A, &csr_A, dim);
+    clock_t start_time, end_time;
+    double cpu_time_used;
+    double total_cpu_time_used = 0;
+    double average_cpu_time;
+
+
+    for (int iteration = 0; iteration < 100; iteration++) {
+        start_time = clock();
+
+        matmatCSR(&csr_A, &csr_A, dim);
+
+        end_time = clock();
+        cpu_time_used = ((double) (end_time - start_time)) / CLOCKS_PER_SEC;
+        total_cpu_time_used += cpu_time_used;
+
+    }
+    average_cpu_time = total_cpu_time_used / 100.0;
+    printf("Average time taken by matmatCSR over 100 iterations: %f seconds\n", average_cpu_time);
+
+    for (int iteration = 0; iteration < 100; iteration++) {
+        start_time = clock();
+
+        matmatCOO(&coo_A, &coo_A, dim);
+        
+        end_time = clock();
+        cpu_time_used = ((double) (end_time - start_time)) / CLOCKS_PER_SEC;
+        total_cpu_time_used += cpu_time_used;
+
+    }
+    average_cpu_time = total_cpu_time_used / 100.0;
+    printf("Average time taken by matmatCOO over 100 iterations: %f seconds\n", average_cpu_time);
+
     freeCSR(&csr_A);
-    //freeCOO(&coo_B);
+    freeCOO(&coo_A);
 
 
   return 0;
+}
 }
