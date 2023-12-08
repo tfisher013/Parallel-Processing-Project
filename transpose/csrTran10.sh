@@ -3,7 +3,7 @@
 #SBATCH --output=csrTran10b.out
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=5
-#SBATCH --partition=normal
+#SBATCH --partition=debug
 #SBATCH --time=00:10:00
 #SBATCH --mail-user saranromero104@unm.edu
 #SBATCH --mail-type ALL

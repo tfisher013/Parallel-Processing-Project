@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
     double start_time, end_time, total_time;
     int i, j, k, m;
 
-    for (k = 17; k < 18; k++) {  
+    for (k = 18; k < 19; k++) {  
         dim = getStandardMatrixDimension(matrices[k]);
         matrix = malloc(dim * dim * sizeof(double));
         getStandardMatrix(matrices[k], dim, matrix);

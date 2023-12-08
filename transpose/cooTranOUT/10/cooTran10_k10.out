@@ -1,4 +1,4 @@
 /usr/bin/ld: skipping incompatible /usr/lib/libpthread.so when searching for -lpthread
 /usr/bin/ld: skipping incompatible /usr/lib/libc.so when searching for -lc
-Sparce Mat. Transpose, procs: 5
-Matrix: 17, Avg. Time: 0.007109 seconds
+Sparce Mat. Transpose, procs: 10
+Matrix: 10, Avg. Time: 0.002312 seconds

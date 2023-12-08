@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=cooTran1
-#SBATCH --output=cooTran1_k17.out
+#SBATCH --output=cooTran1_k0.out
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --partition=normal
