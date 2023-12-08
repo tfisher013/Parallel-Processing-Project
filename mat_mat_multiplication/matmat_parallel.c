@@ -5,7 +5,6 @@
 #include "../util/parse_matrix_file/read_matrix_file.h"
 #include "../util/format_datatypes/COO.h"
 
-
 double *transposeMat(double *mat, int dim)
 {
     double *transpose = calloc(dim * dim, sizeof(double));
@@ -19,27 +18,25 @@ double *transposeMat(double *mat, int dim)
     return transpose;
 }
 
-void cooMat(COO *coo_A, COO *coo_B, COO *coo_C, int dim, int rank)
+void cooMat(COO *coo_A, COO *coo_B, COO *coo_C, int dim, int rank, int procs)
 {
 
     int offset = 0;
-    if(rank == 1){
-        offset += dim / 2;
-    }
+    offset += rank * (dim / procs);
 
     int rowPtrStart = 0;
-    if(rank == 1){
-        for(int i = 0; i < coo_A->nnz; i++){
-            if(coo_A->rows[i] >= dim / 2){
-                rowPtrStart = i;
-                break;
-            }
+    for (int i = 0; i < coo_A->nnz; i++)
+    {
+        if (coo_A->rows[i] >= rank * (dim / procs))
+        {
+            rowPtrStart = i;
+            break;
         }
     }
 
     int counter = 0;
     int constRowPtrA = rowPtrStart;
-    for (int i = offset; i < offset + dim / 2; i++)
+    for (int i = offset; i < offset + dim / procs; i++)
     {
         int rowPtrB = 0;
         for (int j = 0; j < dim; j++)
@@ -104,12 +101,12 @@ int main(int argc, char *argv[])
 
     double *full_matrix_B_tranpose = transposeMat(full_matrix_B, dim);
 
-    COO full_coo_A, full_coo_B;//, coo_C;
+    COO full_coo_A, full_coo_B; //, coo_C;
     convertToCOO(&full_coo_A, dim, dim, full_matrix_A);
     convertToCOO(&full_coo_B, dim, dim, full_matrix_B_tranpose);
 
     MPI_Barrier(MPI_COMM_WORLD);
-    cooMat(&full_coo_A, &full_coo_B, NULL, dim, rank);
+    cooMat(&full_coo_A, &full_coo_B, NULL, dim, rank, procs);
     MPI_Barrier(MPI_COMM_WORLD);
 
     freeCOO(&full_coo_A);
