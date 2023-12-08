@@ -20,7 +20,6 @@ double *transposeMat(double *mat, int dim)
 
 void cooMat(COO *coo_A, COO *coo_B, COO *coo_C, int dim, int rank, int procs)
 {
-
     int offset = 0;
     offset += rank * (dim / procs);
 
@@ -66,8 +65,6 @@ void cooMat(COO *coo_A, COO *coo_B, COO *coo_C, int dim, int rank, int procs)
             printf("Process %d: value at row %d col %d is %f\n", rank, i, j, tmp);
         }
     }
-
-    printf("Complete in %d iterations\n", counter);
 }
 
 int main(int argc, char *argv[])
@@ -106,8 +103,30 @@ int main(int argc, char *argv[])
     convertToCOO(&full_coo_B, dim, dim, full_matrix_B_tranpose);
 
     MPI_Barrier(MPI_COMM_WORLD);
-    cooMat(&full_coo_A, &full_coo_B, NULL, dim, rank, procs);
+
+    double start_time = MPI_Wtime();
+
+    int num_iter = 10;
+    for (int i = 0; i < num_iter; i++)
+    {
+        cooMat(&full_coo_A, &full_coo_B, NULL, dim, rank, procs);
+    }
+
+    double end_time = MPI_Wtime();
+    double total_time = (end_time - start_time) / num_iter;
     MPI_Barrier(MPI_COMM_WORLD);
+
+    if (rank == 0)
+    {
+        MPI_Reduce(MPI_IN_PLACE, &total_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    }
+    else
+    {
+        MPI_Reduce(&total_time, MPI_IN_PLACE, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    }
+    if(rank == 0){
+        printf("Total time for %d processes and dimension %d (%s) is %e\n", procs, dim, argv[1], total_time);
+    }
 
     freeCOO(&full_coo_A);
     freeCOO(&full_coo_B);
