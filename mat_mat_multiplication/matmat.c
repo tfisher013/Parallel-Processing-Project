@@ -104,58 +104,61 @@ int main(int argc, char *argv[]){
                         "../matrices/standardized_matrices/dimension_1000_nonzeros_900100.mtx"};
 
    for(int i =0; i<10; i++){
-    char *filename = matrices_100[i];
-    int dim = getStandardMatrixDimension(filename);
-    double *matrix_A = calloc(dim * dim, sizeof(double));
-    //double *matrix_B = calloc(dim * dim, sizeof(double));
-    getStandardMatrix(filename, dim, matrix_A);
-    //getStandardMatrix(filename, dim, matrix_B);
+        char *filename = matrices_100[i];
+        int dim = getStandardMatrixDimension(filename);
+        double *matrix_A = calloc(dim * dim, sizeof(double));
+        //double *matrix_B = calloc(dim * dim, sizeof(double));
+        getStandardMatrix(filename, dim, matrix_A);
+        //getStandardMatrix(filename, dim, matrix_B);
 
-    // perform COO matmul timing
-    COO coo_A;
-    CSR csr_A;
-   // COO coo_B;
+        // perform COO matmul timing
+        COO coo_A;
+        CSR csr_A;
+        // COO coo_B;
 
-    convertToCOO(&coo_A, dim, dim, matrix_A);
-    convertToCSR(&csr_A, dim, dim, matrix_A);
-    //printCOO(&coo_A);
-    //convertToCOO(&coo_B, dim, dim, matrix_B);
-    clock_t start_time, end_time;
-    double cpu_time_used;
-    double total_cpu_time_used = 0;
-    double average_cpu_time;
+        convertToCOO(&coo_A, dim, dim, matrix_A);
+        convertToCSR(&csr_A, dim, dim, matrix_A);
+        //printCOO(&coo_A);
+        //convertToCOO(&coo_B, dim, dim, matrix_B);
+        clock_t start_time, end_time;
+        double cpu_time_used_coo=0;
+	double cpu_time_used_csr=0;
+        double total_cpu_time_used_csr = 0;
+	double total_cpu_time_used_coo = 0;
+        double average_cpu_time_csr;
+	double average_cpu_time_coo;
+        for (int iteration = 0; iteration < 100; iteration++) {
+            start_time = clock();
 
+            matmatCSR(&csr_A, &csr_A, dim);
 
-    for (int iteration = 0; iteration < 100; iteration++) {
-        start_time = clock();
-
-        matmatCSR(&csr_A, &csr_A, dim);
-
-        end_time = clock();
-        cpu_time_used = ((double) (end_time - start_time)) / CLOCKS_PER_SEC;
-        total_cpu_time_used += cpu_time_used;
+            end_time = clock();
+            cpu_time_used_csr = ((double) (end_time - start_time)) / CLOCKS_PER_SEC;
+            total_cpu_time_used_csr += cpu_time_used_csr;
 
     }
-    average_cpu_time = total_cpu_time_used / 100.0;
-    printf("Average time taken by matmatCSR over 100 iterations: %f seconds\n", average_cpu_time);
+        average_cpu_time_csr = total_cpu_time_used_csr / 100.0;
+        printf("Average time taken by matmatCSR over 100 iterations: %f seconds\n", average_cpu_time_csr);
+ 
+        for (int iteration = 0; iteration < 100; iteration++) {
+            start_time = clock();
 
-    for (int iteration = 0; iteration < 100; iteration++) {
-        start_time = clock();
-
-        matmatCOO(&coo_A, &coo_A, dim);
+            matmatCOO(&coo_A, &coo_A, dim);
         
-        end_time = clock();
-        cpu_time_used = ((double) (end_time - start_time)) / CLOCKS_PER_SEC;
-        total_cpu_time_used += cpu_time_used;
+            end_time = clock();
+            cpu_time_used_coo = ((double) (end_time - start_time)) / CLOCKS_PER_SEC;
+            total_cpu_time_used_coo += cpu_time_used_coo;
 
     }
-    average_cpu_time = total_cpu_time_used / 100.0;
-    printf("Average time taken by matmatCOO over 100 iterations: %f seconds\n", average_cpu_time);
+        average_cpu_time_coo = total_cpu_time_used_coo / 100.0;
+        printf("Average time taken by matmatCOO over 100 iterations: %f seconds\n", average_cpu_time_coo);
 
-    freeCSR(&csr_A);
-    freeCOO(&coo_A);
+        freeCSR(&csr_A);
+        freeCOO(&coo_A);
 
 
   return 0;
-}
+    }
+
+    
 }
