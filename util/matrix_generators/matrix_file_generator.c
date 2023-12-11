@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
         snprintf(filename, sizeof(filename), "dimension_%s_nonzeros_%s.mtx", argv[1], nonzeros_as_string);
         fptr = fopen(filename, "w");
 
-        printf("Writing file %d of %d: %s\n", i, NUM_INTERVALS, filename);
+        printf("Writing file %d of %d: %s\n", i + 1, NUM_INTERVALS, filename);
 
         // first line of the file
         fprintf(fptr, "%d %d %d\n", n, n, (int)(density * n * n));
@@ -58,21 +58,23 @@ int main(int argc, char *argv[])
         printf("Diagonal values populated\n");
 
         // add any extra nonzeros
-        int remaining_nonzeros = i * n * (n - 1) / NUM_INTERVALS;
+        int remaining_nonzeros = density * n * n - n;
         int *nonzero_coords = malloc(remaining_nonzeros * sizeof(int));
         int counter = 0;
         while (counter < remaining_nonzeros)
         {
-            // generate a random 1D coordinate in [1, n^2] (.mtx files are 1-indexed!)
-            int one_d_coord = 1 + rand() % (n * n);
+            // generate a random 2D coordinate in [(1, 1), (n^2, n^2)] (.mtx files are 1-indexed!)
+            int row_coord = 1 + (rand() % n);
+            int col_coord = 1 + (rand() % n);
 
             // check if coordinate represents a diagonal element
-            if (one_d_coord == 1 || one_d_coord % n == 0)
+            if (row_coord == col_coord)
             {
                 continue;
             }
 
             // check if the coordinate has already been used
+            int one_d_coord = (row_coord - 1) * n + col_coord;
             int coord_free = 1;
             for (int j = 0; j < remaining_nonzeros; j++)
             {
@@ -88,15 +90,21 @@ int main(int argc, char *argv[])
                 // add coord to list of used coords
                 nonzero_coords[counter] = one_d_coord;
 
-                // convert 1D coord to 2D
-                int row = 1 + one_d_coord / n;
-                int col = one_d_coord % n;
                 double rand_val = (double)rand() / RAND_MAX;
-
-                fprintf(fptr, "%d %d %f\n", row, col, rand_val);
+                if (rand_val == 0.0)
+                {
+                    rand_val += __DBL_MIN__;
+                }
+                if (rand_val == 1.0)
+                {
+                    rand_val -= __DBL_MIN__;
+                }
+                fprintf(fptr, "%d %d %f\n", row_coord, col_coord, rand_val);
                 counter++;
             }
         }
+
+        printf("Matrix of dimension %d has %d of nonzeros which gives density %f\n", n, counter + n, ((double)(counter + n)) / (n * n));
 
         free(nonzero_coords);
 
